@@ -21,18 +21,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   analyzeNewsSentiment,
   type AnalyzeNewsSentimentOutput,
 } from "@/ai/flows/analyze-news-sentiment";
-import { Loader2, TrendingUp, TrendingDown, Minus, Newspaper } from "lucide-react";
+import { fetchFinancialNews } from "@/ai/flows/fetch-financial-news";
+import type { FetchFinancialNewsOutput } from "@/ai/flows/fetch-financial-news";
+import { Loader2, TrendingUp, TrendingDown, Minus, Newspaper, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 const formSchema = z.object({
-  ticker: z.string().min(1, "Ticker is required.").max(10),
+  topic: z.string().min(1, "Topic is required."),
   articleContent: z
     .string()
     .min(50, "Article content must be at least 50 characters."),
@@ -40,6 +48,7 @@ const formSchema = z.object({
 
 export default function SentimentAnalysis() {
   const [loading, setLoading] = useState(false);
+  const [fetchingNews, setFetchingNews] = useState(false);
   const [result, setResult] = useState<AnalyzeNewsSentimentOutput | null>(
     null
   );
@@ -48,17 +57,51 @@ export default function SentimentAnalysis() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      ticker: "AI-STOCK",
+      topic: "AI-STOCK",
       articleContent: `Visionary AI Inc. (ticker: AI-STOCK) today announced a breakthrough in their quantum computing division, which analysts predict could revolutionize the industry. The company's stock surged 15% in after-hours trading following the news. "This is a game-changer," said one market expert.`,
     },
   });
+
+  async function onFetchNews() {
+    setFetchingNews(true);
+    const topic = form.getValues("topic");
+    try {
+      const { articles }: FetchFinancialNewsOutput = await fetchFinancialNews({ topic });
+      if (articles.length > 0) {
+        // For simplicity, we'll use the first article's content.
+        // A real app might let the user choose or analyze all.
+        form.setValue("articleContent", articles[0].content);
+        toast({
+          title: "News Fetched",
+          description: `Loaded latest news for ${topic} from ${articles[0].source}.`,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "No News Found",
+          description: `Could not find any news for ${topic}.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to Fetch News",
+        description: "An error occurred while fetching financial news.",
+      });
+    } finally {
+      setFetchingNews(false);
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     setResult(null);
 
     try {
-      const response = await analyzeNewsSentiment(values);
+      const response = await analyzeNewsSentiment({
+        articleContent: values.articleContent,
+        ticker: values.topic, // Use topic as the ticker for analysis
+      });
       setResult(response);
     } catch (error) {
       toast({
@@ -102,7 +145,7 @@ export default function SentimentAnalysis() {
             <Newspaper className="h-6 w-6" /> News Sentiment Analyzer
           </CardTitle>
           <CardDescription>
-            Analyze the sentiment of a news article for a specific stock.
+            Analyze the sentiment of a news article for a specific stock or forex pair.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -110,13 +153,43 @@ export default function SentimentAnalysis() {
             <CardContent className="space-y-4">
               <FormField
                 control={form.control}
-                name="ticker"
+                name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Stock Ticker</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., AAPL, GOOGL, MSFT" {...field} />
-                    </FormControl>
+                    <FormLabel>Stock or Forex Pair</FormLabel>
+                    <div className="flex gap-2">
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a topic" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="AI-STOCK">AI-STOCK</SelectItem>
+                          <SelectItem value="EURUSD">EUR/USD</SelectItem>
+                          <SelectItem value="USDJPY">USD/JPY</SelectItem>
+                          <SelectItem value="AAPL">AAPL</SelectItem>
+                          <SelectItem value="GOOGL">GOOGL</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={onFetchNews}
+                        disabled={fetchingNews}
+                        className="whitespace-nowrap"
+                      >
+                        {fetchingNews ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <Download className="mr-2 h-4 w-4" />
+                        )}
+                        Fetch News
+                      </Button>
+                    </div>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -129,7 +202,7 @@ export default function SentimentAnalysis() {
                     <FormLabel>Article Content</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Paste the news article text here..."
+                        placeholder="Paste the news article text here, or use 'Fetch News'..."
                         className="min-h-[200px] resize-y"
                         {...field}
                       />
