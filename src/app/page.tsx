@@ -13,7 +13,7 @@ export default function Home() {
           <div className="bg-primary p-2 rounded-lg shadow-md">
             <Icons.Logo className="h-6 w-6 text-primary-foreground" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">StockVisionAI</h1>
+          <h1 className="text-2xl font-bold text-foreground">TrendIQ</h1>
         </div>
       </header>
       <main className="flex-1 p-4 sm:px-6 sm:py-4 md:gap-8">
