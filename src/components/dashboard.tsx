@@ -111,7 +111,7 @@ export default function Dashboard() {
           <div className="mt-6 flex w-full max-w-sm items-center space-x-2">
             <Input
               type="text"
-              placeholder="e.g., AAPL, GOOGL"
+              placeholder="e.g., AAPL, GOOGL, MSFT"
               className="bg-white/95 text-foreground h-12 text-lg"
               value={inputTicker}
               onChange={(e) => setInputTicker(e.target.value.toUpperCase())}

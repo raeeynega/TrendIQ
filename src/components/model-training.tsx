@@ -126,7 +126,7 @@ export default function ModelTraining() {
                   <FormItem>
                     <FormLabel>Stock Ticker</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., AAPL" {...field} />
+                      <Input placeholder="e.g., AAPL, GOOGL, MSFT" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

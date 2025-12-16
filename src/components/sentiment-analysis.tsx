@@ -115,7 +115,7 @@ export default function SentimentAnalysis() {
                   <FormItem>
                     <FormLabel>Stock Ticker</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., TSLA" {...field} />
+                      <Input placeholder="e.g., AAPL, GOOGL, MSFT" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
