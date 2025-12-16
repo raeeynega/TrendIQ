@@ -19,7 +19,7 @@ import {
   Loader2,
   BarChart,
 } from "lucide-react";
-import StockChart from "@/components/stock-chart";
+import TradingViewWidget from "@/components/tradingview-widget";
 import { mockStockData, type StockData } from "@/lib/mock-data";
 import {
   displayModelPerformanceMetrics,
@@ -30,8 +30,8 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Dashboard() {
-  const [ticker, setTicker] = useState("AI-STOCK");
-  const [inputTicker, setInputTicker] = useState("AI-STOCK");
+  const [ticker, setTicker] = useState("NASDAQ:AAPL");
+  const [inputTicker, setInputTicker] = useState("NASDAQ:AAPL");
   const [stockData, setStockData] = useState<StockData[]>(mockStockData);
   const [prediction, setPrediction] = useState<number | null>(null);
   const [lastClose, setLastClose] = useState<number | null>(null);
@@ -111,7 +111,7 @@ export default function Dashboard() {
           <div className="mt-6 flex w-full max-w-sm items-center space-x-2">
             <Input
               type="text"
-              placeholder="e.g., AAPL, GOOGL, MSFT"
+              placeholder="e.g., NASDAQ:AAPL, TSLA, COIN"
               className="bg-white/95 text-foreground h-12 text-lg"
               value={inputTicker}
               onChange={(e) => setInputTicker(e.target.value.toUpperCase())}
@@ -131,7 +131,7 @@ export default function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <StockChart data={stockData} ticker={ticker} />
+          <TradingViewWidget ticker={ticker} />
         </div>
         <div className="space-y-6">
           <Card className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
