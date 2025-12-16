@@ -21,13 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   analyzeNewsSentiment,
@@ -158,23 +152,7 @@ export default function SentimentAnalysis() {
                   <FormItem>
                     <FormLabel>Stock or Forex Pair</FormLabel>
                     <div className="flex gap-2">
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a topic" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="AI-STOCK">AI-STOCK</SelectItem>
-                          <SelectItem value="EURUSD">EUR/USD</SelectItem>
-                          <SelectItem value="USDJPY">USD/JPY</SelectItem>
-                          <SelectItem value="AAPL">AAPL</SelectItem>
-                          <SelectItem value="GOOGL">GOOGL</SelectItem>
-                        </SelectContent>
-                      </Select>
+                       <Input placeholder="e.g., AAPL, EURUSD, TSLA" {...field} />
                       <Button
                         type="button"
                         variant="outline"
